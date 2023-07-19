@@ -30,12 +30,19 @@ class Workitem(CustomFields, Comments):
         INTERNAL_REF = 'internal reference'
         EXTERNAL_REF = 'external reference'
 
+    def setTestId(testid):
+        self._testid = testid
+
+    def getTestId():
+        return self._testid
+    
     def __init__(self, polarion, project, id=None, uri=None, new_workitem_type=None, new_workitem_fields=None, polarion_workitem=None):
         super().__init__(polarion, project, id, uri)
         self._polarion = polarion
         self._project = project
         self._id = id
         self._uri = uri
+        self._testid = None
 
         service = self._polarion.getService('Tracker')
 
