@@ -198,7 +198,7 @@ class Project(object):
         :rtype: Workitem[]
         """
         return_list = []
-        workitems = self.searchWorkitem(query, order, ['id', 'title', 'type', 'customFields.testCaseID'], limit)
+        workitems = self.searchWorkitem(query, order, ['id', 'title', 'type', 'author', 'status', 'customFields.testCaseID'], limit)
         for workitem in workitems:
             testid = None
             if workitem.customFields is not None:
@@ -207,6 +207,8 @@ class Project(object):
             item.setTestId(testid)
             item.setTitle(workitem['title'])
             item.setType(workitem['type']['id'])
+            item.setAuthor("" if workitem['author']['email'] is None else workitem['author']['email'])
+            item.setStatus("" if workitem['type']['id'] is None else workitem['type']['id'])
             return_list.append(item)
         return return_list
     
