@@ -198,13 +198,15 @@ class Project(object):
         :rtype: Workitem[]
         """
         return_list = []
-        workitems = self.searchWorkitem(query, order, ['id', 'customFields.testCaseID'], limit)
+        workitems = self.searchWorkitem(query, order, ['id', 'title', 'type', 'customFields.testCaseID'], limit)
         for workitem in workitems:
             testid = None
             if workitem.customFields is not None:
                 testid = workitem.customFields['Custom'][0]['value']
             item = Workitem(self.polarion, self, workitem.id)
             item.setTestId(testid)
+            item.setTitle(testid)
+            item.setType(testid)
             return_list.append(item)
         return return_list
     
