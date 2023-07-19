@@ -207,8 +207,6 @@ class Project(object):
             item.setTestId(testid)
             item.setTitle(workitem['title'])
             item.setType(workitem['type']['id'])
-            item.setAuthor("" if workitem['author']['email'] is None else workitem['author']['email'])
-            item.setStatus("" if workitem['type']['id'] is None else workitem['type']['id'])
             return_list.append(item)
         return return_list
     
