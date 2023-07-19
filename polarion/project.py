@@ -182,10 +182,14 @@ class Project(object):
         :rtype: Workitem[]
         """
         return_list = []
-        workitems = self.searchWorkitem(query, order, ['id'], limit)
+        workitems = self.searchWorkitem(query, order, ['id', 'customFields.testCaseID'], limit)
         for workitem in workitems:
-            return_list.append(
-                Workitem(self.polarion, self, workitem.id))
+            testid = None
+            if workitem.customFields is not None:
+                testid = workitem.customFields['Custom'][0]['value']
+            item = Workitem(self.polarion, self, workitem.id)
+            item.setTestId(testid)
+            return_list.append(item)
         return return_list
     
     def searchWorkitemFullItemInBaseline(self, baselineRevision, query='', sort='uri', limit=-1):
