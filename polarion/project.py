@@ -182,6 +182,22 @@ class Project(object):
         :rtype: Workitem[]
         """
         return_list = []
+        workitems = self.searchWorkitem(query, order, ['id'], limit)
+        for workitem in workitems:
+            return_list.append(
+                Workitem(self.polarion, self, workitem.id))
+        return return_list
+
+    def searchWorkitemFullItemWithTestId(self, query='', order='Created', limit=-1):
+        """Query for available workitems. This will query for the items and then fetch all result. May take a while for a big search with many results.
+
+        :param query: The query to use while searching
+        :param order: Order by
+        :param limit: The limit of workitems, -1 for no limit
+        :return: The search results
+        :rtype: Workitem[]
+        """
+        return_list = []
         workitems = self.searchWorkitem(query, order, ['id', 'customFields.testCaseID'], limit)
         for workitem in workitems:
             testid = None
