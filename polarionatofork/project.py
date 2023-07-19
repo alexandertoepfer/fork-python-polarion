@@ -205,8 +205,8 @@ class Project(object):
                 testid = workitem.customFields['Custom'][0]['value']
             item = Workitem(self.polarion, self, workitem.id)
             item.setTestId(testid)
-            item.setTitle(testid)
-            item.setType(testid)
+            item.setTitle(workitem['title'])
+            item.setType(workitem['type']['id'])
             return_list.append(item)
         return return_list
     
