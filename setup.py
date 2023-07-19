@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="polarion",
+    name="polarionatofork",
     version="1.2.1",
     author="Jesper Raemaekers",
     author_email="j.raemaekers@relek.nl",
