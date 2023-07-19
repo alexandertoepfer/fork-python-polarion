@@ -134,6 +134,30 @@ class Workitem(CustomFields, Comments):
         """
         return self._testid
 
+    def setTitle(self, title):
+        """
+        Set the title
+        """
+        self._title = title
+
+    def getTitle(self):
+        """
+        Get the title
+        """
+        return self._title
+
+    def setType(self, type):
+        """
+        Set the type
+        """
+        self._type = type
+
+    def getType(self):
+        """
+        Get the type
+        """
+        return self._type
+    
     def getId(self):
         """
         Get id
