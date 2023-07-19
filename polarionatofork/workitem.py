@@ -133,6 +133,12 @@ class Workitem(CustomFields, Comments):
         Get the test case id
         """
         return self._testid
+
+    def getId(self):
+        """
+        Get id
+        """
+        return self._id
     
     def getAuthor(self):
         """
