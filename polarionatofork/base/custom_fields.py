@@ -1,6 +1,6 @@
 from abc import ABC
 
-from polarion.base.polarion_object import PolarionObject
+from polarionatofork.base.polarion_object import PolarionObject
 
 
 class CustomFields(PolarionObject, ABC):
