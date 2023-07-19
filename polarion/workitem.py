@@ -29,12 +29,6 @@ class Workitem(CustomFields, Comments):
         """
         INTERNAL_REF = 'internal reference'
         EXTERNAL_REF = 'external reference'
-
-    def setTestId(testid):
-        self._testid = testid
-
-    def getTestId():
-        return self._testid
     
     def __init__(self, polarion, project, id=None, uri=None, new_workitem_type=None, new_workitem_fields=None, polarion_workitem=None):
         super().__init__(polarion, project, id, uri)
@@ -128,6 +122,18 @@ class Workitem(CustomFields, Comments):
         else:
             raise Exception(f'Workitem not retrieved from Polarion')
 
+    def setTestId(self, testid):
+        """
+        Set the test case id
+        """
+        self._testid = testid
+
+    def getTestId(self):
+        """
+        Get the test case id
+        """
+        return self._testid
+    
     def getAuthor(self):
         """
         Get the author of the workitem
