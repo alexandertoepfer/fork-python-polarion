@@ -37,6 +37,7 @@ class Workitem(CustomFields, Comments):
         self._id = id
         self._uri = uri
         self._testid = None
+        self._postpone_save = False
 
         service = self._polarion.getService('Tracker')
 
@@ -89,6 +90,14 @@ class Workitem(CustomFields, Comments):
 
         self._buildWorkitemFromPolarion()
 
+    def __enter__(self):
+        self._postpone_save = True
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._postpone_save = False
+        self.save()
+
     def _buildWorkitemFromPolarion(self):
         if self._polarion_item is not None and not self._polarion_item.unresolvable:
             self._original_polarion = copy.deepcopy(self._polarion_item)
@@ -116,9 +125,10 @@ class Workitem(CustomFields, Comments):
                     # now parse the rows
                     for row in self._polarion_test_steps.steps.TestStep:
                         current_row = {}
-                        for col_id in range(len(row.values.Text)):
-                            current_row[columns[col_id]] = row.values.Text[col_id].content
-                        self._parsed_test_steps.append(current_row)
+                        if row.values is not None:
+                            for col_id in range(len(row.values.Text)):
+                                current_row[columns[col_id]] = row.values.Text[col_id].content
+                            self._parsed_test_steps.append(current_row)
         else:
             raise Exception(f'Workitem not retrieved from Polarion')
 
@@ -505,6 +515,39 @@ class Workitem(CustomFields, Comments):
         self._reloadFromPolarion()
         workitem._reloadFromPolarion()
 
+    def getLinkedItemWithRoles(self):
+        """
+        Get linked workitems both linked and back linked item will show up. Will include link roles.
+
+        @return: Array of tuple ('link type', Workitem)
+        """
+        linked_items = []
+        service = self._polarion.getService('Tracker')
+        if self.linkedWorkItems is not None:
+            for linked_item in self.linkedWorkItems.LinkedWorkItem:
+                if linked_item.role is not None:
+                    try:
+                        linked_items.append((linked_item.role.id, Workitem(self._polarion, self._project, uri=linked_item.workItemURI)))
+                    except:
+                        continue
+        if self.linkedWorkItemsDerived is not None:
+            for linked_item in self.linkedWorkItemsDerived.LinkedWorkItem:
+                if linked_item.role is not None:
+                    try:
+                        linked_items.append((linked_item.role.id, Workitem(self._polarion, self._project, uri=linked_item.workItemURI)))
+                    except:
+                        continue
+        return linked_items
+
+    def getLinkedItem(self):
+        """
+        Get linked workitems both linked and back linked item will show up.
+
+        @return: Array of  Workitem
+        @return:
+        """
+        return [item[1] for item in self.getLinkedItemWithRoles()]
+
     def hasAttachment(self):
         """
         Checks if the workitem has attachments
@@ -578,6 +621,7 @@ class Workitem(CustomFields, Comments):
     def delete(self):
         """
         Delete the work item in polarion
+        This does not remove workitem references from documents
         """
         service = self._polarion.getService('Tracker')
         service.deleteWorkItem(self.uri)
@@ -798,6 +842,8 @@ class Workitem(CustomFields, Comments):
         """
         Update the workitem in polarion
         """
+        if self._postpone_save:
+            return
         updated_item = {}
 
         for attr, value in self._polarion_item.__dict__.items():

@@ -79,8 +79,10 @@ The API does not allow access to the project administration.
 
 The package uses; requests, urllib3 and zeep.
 
-It is tested for Python version 3.6 through 3.10.
+It is tested for Python version 3.7 through 3.12.
+Python 3.6 support has been dropped in 1.3.0.
 
 # Known issues or missing features
 - No way of knowing the test run possible statuses.
+- Deleting work items used in documents does not remove the reference from the document.
 
