@@ -28,7 +28,7 @@ class Polarion(object):
     :param proxy: Set to a proxy address to use a proxy, use the format: proxy='ip:port'
     """
 
-    def __init__(self, polarion_url, user, password=None, token=None, static_service_list=False, verify_certificate=True,
+    def __init__(self, polarion_url, user, password=None, token=None, static_service_list=False, verify_certificate=False,
                  svn_repo_url=None, proxy=None, request_session=None, cache=False):
         self.user = user
         self.password = password
