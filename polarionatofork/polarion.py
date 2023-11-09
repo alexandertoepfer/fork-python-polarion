@@ -4,7 +4,7 @@ from urllib.parse import urljoin, urlparse
 import requests
 import tempfile
 import os
-from zeep import Client, CachingClient
+from zeep import Client, CachingClient, Transport
 from zeep.plugins import HistoryPlugin
 
 from .project import Project
@@ -123,11 +123,19 @@ class Polarion(object):
     def get_client(self,service,plugins=[]):
         client = None
         if self.cache:
-            client = CachingClient(self.services[service]['url'] + '?wsdl', plugins=plugins)
+            client = CachingClient(self.services[service]['url'] + '?wsdl', plugins=plugins, transport=self._getTransport())
         else:
-            client = Client(self.services[service]['url'] + '?wsdl', plugins=plugins)
+            client = Client(self.services[service]['url'] + '?wsdl', plugins=plugins, transport=self._getTransport())
         client.transport.session.verify = self.verify_certificate
         return client
+
+    def _getTransport(self):
+        """
+        Gets the zeep transport object
+        """
+        transport = Transport()
+        transport.session.verify = self.verify_certificate
+        return transport
 
     def _updateServices(self):
         """
