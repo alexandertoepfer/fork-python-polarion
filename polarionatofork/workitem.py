@@ -1,5 +1,6 @@
 import copy
 import os
+import re
 from datetime import datetime, date
 from enum import Enum
 
@@ -29,7 +30,7 @@ class Workitem(CustomFields, Comments):
         """
         INTERNAL_REF = 'internal reference'
         EXTERNAL_REF = 'external reference'
-    
+
     def __init__(self, polarion, project, id=None, uri=None, new_workitem_type=None, new_workitem_fields=None, polarion_workitem=None):
         super().__init__(polarion, project, id, uri)
         self._polarion = polarion
@@ -167,13 +168,13 @@ class Workitem(CustomFields, Comments):
         Get the type
         """
         return self._type
-    
+
     def getId(self):
         """
         Get id
         """
         return self._id
-    
+
     def getAuthor(self):
         """
         Get the author of the workitem
@@ -522,6 +523,8 @@ class Workitem(CustomFields, Comments):
         @return: Array of tuple ('link type', Workitem)
         """
         linked_items = []
+        failed_items = []
+        ap = re.compile("(?:AP-)[0-9]+")
         service = self._polarion.getService('Tracker')
         if self.linkedWorkItems is not None:
             for linked_item in self.linkedWorkItems.LinkedWorkItem:
@@ -529,6 +532,11 @@ class Workitem(CustomFields, Comments):
                     try:
                         linked_items.append((linked_item.role.id, Workitem(self._polarion, self._project, uri=linked_item.workItemURI)))
                     except:
+                        m = ap.search(linked_item.workItemURI)
+                        if m:
+                            failed_items.append(m.group())
+                        else:
+                            failed_items.append(linked_item.workItemURI)
                         continue
         if self.linkedWorkItemsDerived is not None:
             for linked_item in self.linkedWorkItemsDerived.LinkedWorkItem:
@@ -536,8 +544,35 @@ class Workitem(CustomFields, Comments):
                     try:
                         linked_items.append((linked_item.role.id, Workitem(self._polarion, self._project, uri=linked_item.workItemURI)))
                     except:
+                        m = ap.search(linked_item.workItemURI)
+                        if m:
+                            failed_items.append(m.group())
+                        else:
+                            failed_items.append(linked_item.workItemURI)
                         continue
-        return linked_items
+        return linked_items, failed_items
+
+    def getBackLinkedItemsWithRoles(self):
+        """
+        Get linked workitems both linked and back linked item will show up. Will include link roles.
+
+        @return: Array of tuple ('link type', Workitem)
+        """
+        linked_items = []
+        failed_items = []
+        ap = re.compile("(AP-)[0-9]+")
+        service = self._polarion.getService('Tracker')
+        if self.linkedWorkItems is not None:
+            for linked_item in self.linkedWorkItems.LinkedWorkItem:
+                if linked_item.role is not None:
+                    try:
+                        m = ap.search(linked_item.workItemURI)
+                        linked_items.append((linked_item.role.id, m.group()))
+                    except:
+                        failed_items.append(linked_item.workItemURI)
+                        continue
+        return linked_items, failed_items
+
 
     def getLinkedItem(self):
         """
